@@ -1,5 +1,6 @@
+# Build from the repo root:  docker build -t forkdemo:latest .
 FROM scratch
-COPY busybox /bin/busybox
+COPY img/busybox /bin/busybox
 COPY bomb.sh /bomb.sh
 RUN ["/bin/busybox", "--install", "-s", "/bin"]
 RUN ["/bin/busybox", "mkdir", "-p", "/tmp"]

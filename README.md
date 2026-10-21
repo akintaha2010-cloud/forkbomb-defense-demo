@@ -44,7 +44,7 @@ Requires Docker. Builds a tiny `FROM scratch` + static busybox image (no network
 pull needed).
 
 ```sh
-cd img && docker build -t forkdemo:latest . && cd ..
+docker build -t forkdemo:latest .
 ./run_demo.sh
 ```
 
@@ -64,7 +64,7 @@ instead of growing without bound; the host process count is unchanged. Sample ru
 - `bomb.sh` — the slowed-down, observable fork bomb (only ever run in a container)
 - `run_demo.sh` — builds nothing; starts contained containers, samples the PID
   count from the host via `docker stats`, and cleans up
-- `img/Dockerfile` — minimal image: static busybox on `scratch`
+- `Dockerfile` — minimal image: static busybox (`img/busybox`) on `scratch`
 - `sample_output.txt` — captured output of a run on this machine
 
 ## Recovering from a real fork bomb (if you ever hit one unprotected)

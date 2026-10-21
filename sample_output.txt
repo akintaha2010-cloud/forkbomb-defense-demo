@@ -1,0 +1,46 @@
+Host (never modified by this demo):
+  ulimit -u (max user processes) = 128110
+  cgroup version = cgroup2fs
+
+A fork bomb is: bomb(){ bomb & bomb & ...; }; bomb  -- each call spawns two
+more, so with no limit the process count doubles until the machine dies.
+
+==============================================================
+DEFENSE 1 - cgroup pids.max = 64  (--pids-limit 64)
+  docker run --pids-limit 64
+  live process count inside the container (sampled from the host):
+    59 procs
+    59 procs
+    59 procs
+    59 procs
+    59 procs
+    59 procs
+  -> plateaus at the cap instead of growing without bound.
+  host untouched: processes owned by me on the HOST = 64
+
+==============================================================
+DEFENSE 2 - RLIMIT_NPROC = 64 for a unused uid (--ulimit nproc=64, -u 4321)
+  docker run --pids-limit 100000 --ulimit nproc=64:64 -u 4321:4321
+  live process count inside the container (sampled from the host):
+    55 procs
+    55 procs
+    55 procs
+    55 procs
+    55 procs
+    55 procs
+  -> plateaus at the cap instead of growing without bound.
+  host untouched: processes owned by me on the HOST = 64
+
+==============================================================
+CONTRAST - raise the cgroup cap to 400: plateaus higher, still bounded (--pids-limit 400)
+  docker run --pids-limit 400
+  live process count inside the container (sampled from the host):
+    383 procs
+    383 procs
+    383 procs
+    383 procs
+    383 procs
+    383 procs
+  -> plateaus at the cap instead of growing without bound.
+  host untouched: processes owned by me on the HOST = 64
+
